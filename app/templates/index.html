@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="/add">Add Member</a>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Actions</th>
+    </tr>
+    {% for member in members %}
+    <tr>
+        <td>{{ member.name }}</td>
+        <td>{{ member.role }}</td>
+        <td>
+            <a href="/edit/{{ member.id }}">Edit</a>
+            <a href="/delete/{{ member.id }}">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
