@@ -39,7 +39,7 @@ jobs:
         run: |
           ssh  ubuntu@$SERVER_IP -i mykey.pem << 'EOF'
             APP_DIR="member-manager"
-            REPO_URL="git@github.com:amitgiri-13/cicd-docker-ec2.git"
+            REPO_URL="https://github.com/amitgiri-13/cicd-docker-ec2.git"
 
             # Check if repo exists
             if [ -d ~/$APP_DIR/.git ]; then
