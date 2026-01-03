@@ -11,7 +11,7 @@ jobs:
     name: "deploy my code in a container in ec2"
     runs-on: "ubuntu-latest"
     env:
-      - SERVER_IP = ${{ SERVER_IP }}
+      SERVER_IP = ${{ SERVER_IP }}
     
     steps:
       - name: "Checkout code"
