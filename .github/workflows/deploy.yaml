@@ -54,7 +54,6 @@ jobs:
             fi
 
             # Build and run Docker containers
-            docker compose down
             docker compose pull
-            docker compose up -d --build
+            docker compose up -d --build --no-cache
           EOF
