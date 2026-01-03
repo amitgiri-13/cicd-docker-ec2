@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Bootcamp Members</title>
-    <style>
-        body { font-family: Arial; margin: 40px; }
-        table { border-collapse: collapse; width: 60%; }
-        th, td { border: 1px solid #ccc; padding: 8px; }
-        a { margin-right: 10px; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Bootcamp Member Management</h1>
-    {% block content %}{% endblock %}
+<body class="bg-gray-100 font-sans p-10">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Bootcamp Member Management</h1>
+
+        {% block content %}{% endblock %}
+    </div>
 </body>
 </html>

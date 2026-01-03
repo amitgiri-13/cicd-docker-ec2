@@ -1,13 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form method="post">
-    <label>Name:</label><br>
-    <input type="text" name="name" required><br><br>
+<div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Add Member</h2>
 
-    <label>Role:</label><br>
-    <input type="text" name="role" required><br><br>
+    <form method="post" class="space-y-4">
+        <div>
+            <label class="block text-gray-700 font-medium mb-1" for="name">Name</label>
+            <input 
+                type="text" 
+                name="name" 
+                id="name"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+            >
+        </div>
 
-    <button type="submit">Add Member</button>
-</form>
+        <div>
+            <label class="block text-gray-700 font-medium mb-1" for="role">Role</label>
+            <input 
+                type="text" 
+                name="role" 
+                id="role"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+            >
+        </div>
+
+        <div class="text-center">
+            <button 
+                type="submit" 
+                class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition"
+            >
+                Add Member
+            </button>
+        </div>
+    </form>
+</div>
 {% endblock %}

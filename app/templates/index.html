@@ -1,22 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="/add">Add Member</a>
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Role</th>
-        <th>Actions</th>
-    </tr>
-    {% for member in members %}
-    <tr>
-        <td>{{ member.name }}</td>
-        <td>{{ member.role }}</td>
-        <td>
-            <a href="/edit/{{ member.id }}">Edit</a>
-            <a href="/delete/{{ member.id }}">Delete</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="flex justify-end mb-4">
+    <a href="/add" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Add Member</a>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <thead class="bg-gray-200">
+            <tr>
+                <th class="text-left py-3 px-6 font-semibold text-gray-700">Name</th>
+                <th class="text-left py-3 px-6 font-semibold text-gray-700">Role</th>
+                <th class="text-left py-3 px-6 font-semibold text-gray-700">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="py-3 px-6">{{ member.name }}</td>
+                <td class="py-3 px-6">{{ member.role }}</td>
+                <td class="py-3 px-6 space-x-2">
+                    <a href="/edit/{{ member.id }}" class="text-blue-500 hover:underline">Edit</a>
+                    <a href="/delete/{{ member.id }}" class="text-red-500 hover:underline">Delete</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="py-4 px-6 text-center text-gray-500">No members found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
