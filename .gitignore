@@ -205,3 +205,40 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files (sensitive)
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI-generated plan output
+*.tfplan
+
+# Ignore sensitive variables files
+*.tfvars
+*.tfvars.json
+
+# Backup files
+*.backup
+
+# Ignore IDE/editor settings
+*.swp
+*.swo
+*.vscode/
+.idea/
+
