@@ -1,63 +1,59 @@
----
-name : "Build and run docker container in ec2"
+name: "Build and run docker container in EC2"
 
 on:
-  push :
+  push:
     branches:
       - main
 
 jobs:
   deploy-my-code:
-    name: "deploy my code in a container in ec2"
-    runs-on: "ubuntu-latest"
+    name: "Deploy my code in Docker container on EC2"
+    runs-on: ubuntu-latest
     env:
-      SERVER_IP = ${{ SERVER_IP }}
-    
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+
     steps:
-      - name: "Checkout code"
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Configure SSH"
+      - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-          cat ~/.ssh/config
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
           touch ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
-      - name: "Make ssh connection"
-        run: | 
-          touch mykey.pem
-          echo "$SSH_KEY64" | base64 -d > mykey.pem  && chmod 400 mykey.pem
+      - name: Setup SSH key
+        run: |
+          echo "$SSH_KEY64" | base64 -d > mykey.pem
+          chmod 400 mykey.pem
           ssh-keygen -R $SERVER_IP
-        env: 
+        env:
           SSH_KEY64: ${{ secrets.SSH_KEY64 }}
 
-      - name: "Pull code and run container"
+      - name: Pull code and run Docker container
         run: |
-          ssh -t ubuntu@$SERVER_IP -i mykey.pem  << 'EOF'
+          ssh -o StrictHostKeyChecking=no -t ubuntu@$SERVER_IP -i mykey.pem << 'EOF'
             APP_DIR="member-manager"
             REPO_URL="git@github.com:amitgiri-13/cicd-docker-ec2.git"
 
-            if [ -d $APP_DIR/.git ]; then 
-              echo "Repo exists..."
-              echo "Pulling latest changes..."
+            # Check if repo exists
+            if [ -d ~/$APP_DIR/.git ]; then
+              echo "Repo exists. Pulling latest changes..."
               cd ~/$APP_DIR
-              git pull origin main 
+              git reset --hard
+              git pull origin main
             else
-              echo "Repo doesn't exist..."
-              echo "Clonning repo..."
+              echo "Repo doesn't exist. Cloning..."
               git clone $REPO_URL $APP_DIR
-              cd $APP_DIR
+              cd ~/$APP_DIR
             fi
 
-            docker compose up -d
+            # Build and run Docker containers
+            docker compose pull
+            docker compose up -d --build
           EOF
-
-          
-
-            
-
