@@ -3,7 +3,7 @@ services:
     build: .
     container_name: bootcamp_app
     ports:
-      - "8000:8000"
+      - "80:8000"
     restart: always
     environment:
       POSTGRES_USER: bootcamp
