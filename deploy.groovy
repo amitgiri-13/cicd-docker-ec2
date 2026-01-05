@@ -24,6 +24,8 @@ pipeline {
                     sh '''
                     set -e
 
+                    KEY_PATH="$WORKSPACE/mykey.pem"
+
                     # Configure SSH
                     mkdir -p ~/.ssh
                     chmod 700 ~/.ssh
@@ -32,15 +34,15 @@ pipeline {
                     touch ~/.ssh/known_hosts
                     chmod 600 ~/.ssh/known_hosts
 
-                    # Decode SSH key
-                    echo $SSH_KEY64 > mykey.pem
-                    chmod 400 mykey.pem
+                    # Decode SSH key (WRITE TO WORKSPACE)
+                    echo "$SSH_KEY64"  > "$KEY_PATH"
+                    chmod 400 "$KEY_PATH"
 
-                    # Remove old host key if exists
-                    ssh-keygen -R $SERVER_IP || true
+                    # Remove old host key
+                    ssh-keygen -R "$SERVER_IP" || true
 
                     # SSH into EC2 and deploy
-                    ssh -i mykey.pem ${SSH_USER}@${SERVER_IP} << 'EOF'
+                    ssh -i "$KEY_PATH" ${SSH_USER}@${SERVER_IP} << 'EOF'
                       set -e
 
                       APP_DIR="member-manager"
@@ -67,6 +69,9 @@ pipeline {
     }
 
     post {
+        always {
+            sh 'rm -f "$WORKSPACE/mykey.pem" || true'
+        }
         success {
             echo "Deployment successful"
         }
