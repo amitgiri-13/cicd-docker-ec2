@@ -19,42 +19,31 @@ pipeline {
             steps {
                 withCredentials([
                     string(credentialsId: 'SERVER_IP', variable: 'SERVER_IP'),
-                    string(credentialsId: 'SSH_KEY64', variable: 'SSH_KEY64')
+                    file(credentialsId: 'SSH_KEY64', variable: 'SSH_KEY_FILE')
                 ]) {
                     sh '''
                     set -e
 
-      
+                    chmod 400 "$SSH_KEY_FILE"
 
-                    # Configure SSH
                     mkdir -p ~/.ssh
                     chmod 700 ~/.ssh
                     echo -e "Host *\\n\\tStrictHostKeyChecking no\\n" > ~/.ssh/config
                     chmod 600 ~/.ssh/config
-                    touch ~/.ssh/known_hosts
-                    chmod 600 ~/.ssh/known_hosts
 
-                    # Decode SSH key (WRITE TO WORKSPACE)
-                    echo "$SSH_KEY64"  > mykey.pem
-                    chmod 400 mykey.pem
-
-                    # Remove old host key
                     ssh-keygen -R "$SERVER_IP" || true
 
-                    # SSH into EC2 and deploy
-                    ssh -i mykey.pem ${SSH_USER}@${SERVER_IP} << 'EOF'
+                    ssh -i "$SSH_KEY_FILE" ${SSH_USER}@${SERVER_IP} << 'EOF'
                       set -e
 
                       APP_DIR="member-manager"
                       REPO_URL="https://github.com/amitgiri-13/cicd-docker-ec2.git"
 
                       if [ -d ~/$APP_DIR/.git ]; then
-                        echo "Repo exists. Pulling latest changes..."
                         cd ~/$APP_DIR
                         git reset --hard
                         git pull origin main
                       else
-                        echo "Repo doesn't exist. Cloning..."
                         git clone $REPO_URL $APP_DIR
                         cd ~/$APP_DIR
                       fi
@@ -69,9 +58,6 @@ pipeline {
     }
 
     post {
-        always {
-            sh 'rm -f "$WORKSPACE/mykey.pem" || true'
-        }
         success {
             echo "Deployment successful"
         }
