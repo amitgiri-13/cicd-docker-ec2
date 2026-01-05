@@ -2,42 +2,63 @@ pipeline {
     agent any
 
     environment {
-        SERVER_IP = '184.72.120.191'
-        APP_DIR   = 'member-manager'
+        APP_DIR  = 'member-manager'
         REPO_URL = 'https://github.com/amitgiri-13/cicd-docker-ec2.git'
         SSH_USER = 'ubuntu'
     }
 
     stages {
 
-        stage('Checkout Jenkinsfile Repo') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Deploy to EC2 via SSH') {
+        stage('Configure SSH & Deploy') {
             steps {
-                sshagent(credentials: ['SSH_KEY64']) {
+                withCredentials([
+                    string(credentialsId: 'SERVER_IP', variable: 'SERVER_IP'),
+                    string(credentialsId: 'SSH_KEY64', variable: 'SSH_KEY64')
+                ]) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} << EOF
+                    set -e
 
+                    # Configure SSH
+                    mkdir -p ~/.ssh
+                    chmod 700 ~/.ssh
+                    echo -e "Host *\\n\\tStrictHostKeyChecking no\\n" > ~/.ssh/config
+                    chmod 600 ~/.ssh/config
+                    touch ~/.ssh/known_hosts
+                    chmod 600 ~/.ssh/known_hosts
+
+                    # Decode SSH key
+                    echo "$SSH_KEY64" | base64 -d > mykey.pem
+                    chmod 400 mykey.pem
+
+                    # Remove old host key if exists
+                    ssh-keygen -R $SERVER_IP || true
+
+                    # SSH into EC2 and deploy
+                    ssh -i mykey.pem ${SSH_USER}@${SERVER_IP} << 'EOF'
                       set -e
 
-                      if [ -d ~/${APP_DIR}/.git ]; then
+                      APP_DIR="member-manager"
+                      REPO_URL="https://github.com/amitgiri-13/cicd-docker-ec2.git"
+
+                      if [ -d ~/$APP_DIR/.git ]; then
                         echo "Repo exists. Pulling latest changes..."
-                        cd ~/${APP_DIR}
+                        cd ~/$APP_DIR
                         git reset --hard
                         git pull origin main
                       else
-                        echo "Repo does not exist. Cloning..."
-                        git clone ${REPO_URL} ${APP_DIR}
-                        cd ~/${APP_DIR}
+                        echo "Repo doesn't exist. Cloning..."
+                        git clone $REPO_URL $APP_DIR
+                        cd ~/$APP_DIR
                       fi
 
                       docker compose pull
                       docker compose up -d --build
-
                     EOF
                     '''
                 }
