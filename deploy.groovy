@@ -18,7 +18,7 @@ pipeline {
 
         stage('Deploy to EC2 via SSH') {
             steps {
-                sshagent(credentials: ['ec2-ssh-key']) {
+                sshagent(credentials: ['SSH_KEY64']) {
                     sh '''
                     ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} << EOF
 
