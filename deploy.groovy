@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SERVER_IP = 'YOUR_EC2_PUBLIC_IP'
+        SERVER_IP = '184.72.120.191'
         APP_DIR   = 'member-manager'
         REPO_URL = 'https://github.com/amitgiri-13/cicd-docker-ec2.git'
         SSH_USER = 'ubuntu'
