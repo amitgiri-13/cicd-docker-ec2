@@ -35,7 +35,7 @@ pipeline {
                     chmod 600 ~/.ssh/known_hosts
 
                     # Decode SSH key (WRITE TO WORKSPACE)
-                    echo "$SSH_KEY64"  > "$KEY_PATH"
+                    echo "$SSH_KEY64" | base64 -d > "$KEY_PATH"
                     chmod 400 "$KEY_PATH"
 
                     # Remove old host key
