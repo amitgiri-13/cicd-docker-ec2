@@ -2,57 +2,55 @@ pipeline {
     agent any
 
     environment {
-        EC2_HOST= 'your.ec2.public.ip'
-        EC2_USER = 'ubuntu'
-        APP_NAME = 'aayush-portfolio'
-        SSH_KEY64 = credentials('SSH_KEY64')
+        SERVER_IP = 'YOUR_EC2_PUBLIC_IP'
+        APP_DIR   = 'member-manager'
+        REPO_URL = 'https://github.com/amitgiri-13/cicd-docker-ec2.git'
+        SSH_USER = 'ubuntu'
     }
 
     stages {
 
-        stage('Configure SSH') {
+        stage('Checkout Jenkinsfile Repo') {
             steps {
-                sh '''
-                mkdir -p ~/.ssh
-                echo "$SSH_KEY64" | base64 -d > ~/.ssh/id_rsa
-                chmod 600 ~/.ssh/id_rsa
-                ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-                '''
+                checkout scm
             }
         }
 
-        stage('Deploy to EC2') {
+        stage('Deploy to EC2 via SSH') {
             steps {
-                sh '''
-                ssh $EC2_USER@$EC2_HOST << 'EOF'
-                  set -e
+                sshagent(credentials: ['ec2-ssh-key']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} << EOF
 
-                  echo "Deploy started"
+                      set -e
 
-                  if [ ! -d "$HOME/aayush-portfolio" ]; then
-                    git clone https://github.com/aayushadhikari/aayush-portfolio.git $HOME/aayush-portfolio
-                  else
-                    cd $HOME/aayush-portfolio
-                    git pull origin main
-                  fi
+                      if [ -d ~/${APP_DIR}/.git ]; then
+                        echo "Repo exists. Pulling latest changes..."
+                        cd ~/${APP_DIR}
+                        git reset --hard
+                        git pull origin main
+                      else
+                        echo "Repo does not exist. Cloning..."
+                        git clone ${REPO_URL} ${APP_DIR}
+                        cd ~/${APP_DIR}
+                      fi
 
-                  cd $HOME/aayush-portfolio
+                      docker compose pull
+                      docker compose up -d --build
 
-                  docker build -t $APP_NAME .
-
-                  docker stop $APP_NAME || true
-                  docker rm $APP_NAME || true
-
-                  docker run -d \
-                    --name $APP_NAME \
-                    -p 80:80 \
-                    --restart unless-stopped \
-                    $APP_NAME
-
-                  echo "Deploy finished"
-                EOF
-                '''
+                    EOF
+                    '''
+                }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment successful"
+        }
+        failure {
+            echo "Deployment failed"
         }
     }
 }
