@@ -33,7 +33,7 @@ pipeline {
                     chmod 600 ~/.ssh/known_hosts
 
                     # Decode SSH key
-                    echo "$SSH_KEY64" | base64 -d > mykey.pem
+                    echo "$SSH_KEY64" > mykey.pem
                     chmod 400 mykey.pem
 
                     # Remove old host key if exists
