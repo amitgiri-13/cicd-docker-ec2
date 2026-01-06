@@ -1,7 +1,6 @@
 name: "Build and run docker container in EC2"
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -14,6 +13,7 @@ jobs:
       SERVER_IP: ${{ vars.SERVER_IP }}
       DOCKER_USER: ${{ vars.DOCKER_USER }}
       DOCKER_REPO: ${{ vars.DOCKER_REPO }}
+      TAG: ${ GITHUB_REF_NAME#v }
 
     steps:
       - name: Checkout code
@@ -30,10 +30,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t "$DOCKER_USER/$DOCKER_REPO:latest" .
+          docker build -t "$DOCKER_USER/$DOCKER_REPO:$TAG" .
 
       - name: Push Docker image
         run: | 
-          docker push "$DOCKER_USER/$DOCKER_REPO:latest"
+          docker push "$DOCKER_USER/$DOCKER_REPO:$TAG"
 
 
