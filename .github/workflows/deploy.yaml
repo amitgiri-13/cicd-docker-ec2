@@ -2,8 +2,8 @@ name: "Build and run docker container in EC2"
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
       
 
 jobs:
@@ -12,8 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVER_IP: ${{ vars.SERVER_IP }}
-      DOCKER_USER: ${{ vars.DOCKER_USER }}
-      DOCKER_REPO: ${{ vars.DOCKER_REPO }}
+      SERVER_USER: ${{ vars.SERVER_USER }}
+      DOCKER_HUB_USER: ${{ vars.DOCKER_USER }}
+      DOCKER_HUB_REPO: ${{ vars.DOCKER_REPO }}
 
     steps:
       - name: Checkout code
@@ -21,24 +22,51 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Set up TAG
+      # - name: Set up TAG
+      #   run: |
+      #     echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      # - name: Set up Docker Buildx 
+      #   uses: docker/setup-buildx-action@v3
+
+      # - name: Login to Dockerhub
+      #   run: |
+      #     echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_HUB_USER --password-stdin
+
+      # - name: Build Docker image
+      #   run: |
+      #     docker build -t "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG" .
+
+      # - name: Push Docker image
+      #   run: | 
+      #     docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
+
+      - name: Set up for SSH connection
         run: |
-          echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+          mkdir -p ~/.ssh
+          chmod 600 ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" ~/.ssh/config
+          chmod 600 ~/.ssh/config 
 
-      - name: Set up Docker Buildx 
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Dockerhub
+      - name: Add private key for ssh 
         run: |
-          echo "$TAG"
-          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_USER --password-stdin
-
-      - name: Build Docker image
+          echo ${{ secrets.SSH_KEY64 }} | base64 -d >> mykey.pem
+          chmod 400 mykey.pem 
+          ssh-keygen -R $SERVER_IP
+      
+      - name: Make ssh connection, pull and run docker image
         run: |
-          docker build -t "$DOCKER_USER/$DOCKER_REPO:$TAG" .
+          ssh -i mykey.pem $SERVER_USER@$SERVER_IP 'EOF'
+          docker pull amitgiri13/randmetask:1.0.0
+          docker run --name randmetask -p 80:8000 -d amitgiri13/randmetask:1.0.0
+          EOF 
+          
 
-      - name: Push Docker image
-        run: | 
-          docker push "$DOCKER_USER/$DOCKER_REPO:$TAG"
+
+      
+
+
+           
+
 
 
