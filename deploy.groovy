@@ -36,8 +36,8 @@ pipeline {
                     ssh -i "$SSH_KEY_FILE" ${SSH_USER}@${SERVER_IP} << 'EOF'
                       set -e
 
-                      APP_DIR=${APP_DIR}
-                      REPO_URL=${REPO_URL}
+                      APP_DIR="${APP_DIR}"
+                      REPO_URL="${REPO_URL}"
 
                       if [ -d ~/$APP_DIR/.git ]; then
                         cd ~/$APP_DIR
