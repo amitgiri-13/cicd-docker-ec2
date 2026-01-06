@@ -1,0 +1,53 @@
+terraform/
+*.groovy
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.env.*
+
+# Environment / secrets
+*.env
+*.secret
+
+# Git
+.git/
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Logs
+*.log
+
+# Tests & coverage
+.coverage
+htmlcov/
+.pytest_cache/
+tests/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if frontend exists)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+build/
+
