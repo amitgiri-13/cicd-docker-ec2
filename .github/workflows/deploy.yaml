@@ -26,11 +26,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $DOCKER_USER/$DOCKER_REPO:latest .
+          docker build -t "$DOCKER_USER/$DOCKER_REPO:latest" .
 
       - name: Push Docker image
         run: | 
-          docker push $DOCKER_USER/$DOCKER_REPO:latest .
+          docker push "$DOCKER_USER/$DOCKER_REPO:latest"
 
       - name: Configure SSH
         run: |
