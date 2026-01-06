@@ -13,7 +13,7 @@ jobs:
       SERVER_IP: ${{ vars.SERVER_IP }}
       DOCKER_USER: ${{ vars.DOCKER_USER }}
       DOCKER_REPO: ${{ vars.DOCKER_REPO }}
-      TAG: ${ GITHUB_REF_NAME#v }
+      TAG: ${GITHUB_REF_NAME#v}
 
     steps:
       - name: Checkout code
@@ -26,6 +26,7 @@ jobs:
 
       - name: Login to Dockerhub
         run: |
+          echo "$TAG"
           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_USER --password-stdin
 
       - name: Build Docker image
