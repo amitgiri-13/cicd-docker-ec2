@@ -2,8 +2,9 @@ name: "Build and run docker container in EC2"
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
+      
 
 jobs:
   deploy-my-code:
