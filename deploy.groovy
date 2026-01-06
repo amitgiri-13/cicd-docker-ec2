@@ -36,8 +36,8 @@ pipeline {
                     ssh -i "$SSH_KEY_FILE" ${SSH_USER}@${SERVER_IP} << 'EOF'
                       set -e
 
-                      APP_DIR  = 'member-manager'
-                      REPO_URL = 'https://github.com/amitgiri-13/cicd-docker-ec2.git'
+                      APP_DIR='member-manager'
+                      REPO_URL='https://github.com/amitgiri-13/cicd-docker-ec2.git'
 
                       if [ -d ~/$APP_DIR/.git ]; then
                         cd ~/$APP_DIR
