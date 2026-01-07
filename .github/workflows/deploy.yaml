@@ -57,33 +57,27 @@ jobs:
         env: 
           SSH_KEY64: ${{ secrets.SSH_KEY64 }}
       
+      - name: Copy docker-compose file
+        run: |
+          scp -i mykey.pem ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
+      
       - name: Make ssh connection, pull and run docker image
         run: |
           ssh -i mykey.pem $SERVER_USER@$SERVER_IP "
-          docker pull $DOCKER_HUB_USER/$DOCKER_HUB_REPO:1.0.2
-          docker pull postgres:15
 
-          docker rm -f db app || true 
+          # create env file
+          echo POSTGRES_USER=$POSTGRES_USER >> ~/.env 
+          echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> ~/.env 
+          echo POSTGRES_DB=$POSTGRES_DB >> ~/.env 
 
-          # run postgres
-          docker run -d \
-            --name db \
-            -e POSTGRES_USER=$POSTGRES_USER \
-            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-            -e POSTGRES_DB=$POSTGRES_DB \
-            -p 5432:5432 \
-            postgres:15
-          
-          # run app
-          docker run -d \
-            --name app \
-            -e POSTGRES_USER=$POSTGRES_USER \
-            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-            -e POSTGRES_DB=$POSTGRES_DB \
-            -p 80:8080 \
-            -v postgres_data:/var/lib/postgresql/data \
-            --link db:db \
-            $DOCKER_HUB_USER/$DOCKER_HUB_REPO:1.0.2
+          echo APP_IMAGE=$DOCKER_HUB_USER/$DOCKER_HUB_REPO:1.0.2 >> ~/.env
+          echo DATABASE_IMAGE=postgres:1.5 >>  ~/.env 
+
+          docker compose down
+          docker compose pull 
+          docker compose up -d --build 
+
+          rm ~/.env  
           "
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
