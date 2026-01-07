@@ -1,26 +1,26 @@
 services:
   app:
-    build: .
+    image: ${APP_IMAGE}
     container_name: bootcamp_app
     ports:
       - "80:8000"
     restart: always
     environment:
-      POSTGRES_USER: bootcamp
-      POSTGRES_PASSWORD: bootcamp123
-      POSTGRES_DB: bootcamp_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_HOST: db
     depends_on:
       - db
 
   db:
-    image: postgres:15
+    image: ${DATABASE_IMAGE}
     container_name: bootcamp_db
     restart: always
     environment:
-      POSTGRES_USER: bootcamp
-      POSTGRES_PASSWORD: bootcamp123
-      POSTGRES_DB: bootcamp_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
