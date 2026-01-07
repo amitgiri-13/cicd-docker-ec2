@@ -71,7 +71,7 @@ jobs:
           echo POSTGRES_DB=$POSTGRES_DB >> ~/.env 
 
           echo APP_IMAGE=$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG >> ~/.env
-          echo DATABASE_IMAGE=postgres:1.5 >>  ~/.env 
+          echo DATABASE_IMAGE=postgres:15 >>  ~/.env 
 
           docker compose up -d --build 
 
