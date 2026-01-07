@@ -44,8 +44,8 @@ jobs:
       - name: Set up for SSH connection
         run: |
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo -e "Host *\n\tStrictHostKeyChecking no\n" ~/.ssh/config
+          chmod 600 ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
           chmod 600 ~/.ssh/config 
 
       - name: Add private key for ssh 
