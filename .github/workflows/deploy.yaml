@@ -63,8 +63,8 @@ jobs:
           docker pull $DOCKER_HUB_USER/$DOCKER_HUB_REPO:1.0.2
           docker pull postgres:15
 
-          docker rm -f db app
-          
+          docker rm -f db app ||
+
           # run postgres
           docker run -d \
             --name db \
