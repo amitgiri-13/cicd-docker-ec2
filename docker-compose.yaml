@@ -1,6 +1,8 @@
 services:
   app:
     image: ${APP_IMAGE}
+    env_file:
+      - ./.env/dev_env
     container_name: bootcamp_app
     ports:
       - "80:8000"
@@ -15,6 +17,8 @@ services:
 
   db:
     image: ${DATABASE_IMAGE}
+    env_file:
+      - ./.env/dev_env
     container_name: bootcamp_db
     restart: always
     environment:
