@@ -22,24 +22,24 @@ jobs:
         with:
           fetch-depth: 0
       
-      # - name: Set up TAG
-      #   run: |
-      #     echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+      - name: Set up TAG
+        run: |
+          echo "TAG=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
 
-      # - name: Set up Docker Buildx 
-      #   uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx 
+        uses: docker/setup-buildx-action@v3
 
-      # - name: Login to Dockerhub
-      #   run: |
-      #     echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_HUB_USER --password-stdin
+      - name: Login to Dockerhub
+        run: |
+          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u $DOCKER_HUB_USER --password-stdin
 
-      # - name: Build Docker image
-      #   run: |
-      #     docker build -t "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG" .
+      - name: Build Docker image
+        run: |
+          docker build -t "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG" .
 
-      # - name: Push Docker image
-      #   run: | 
-      #     docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
+      - name: Push Docker image
+        run: | 
+          docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
 
       - name: Set up for SSH connection
         run: |
@@ -56,14 +56,38 @@ jobs:
       
       - name: Make ssh connection, pull and run docker image
         run: |
-          ssh -i mykey.pem $SERVER_USER@$SERVER_IP 'EOF'
+          ssh -i mykey.pem $SERVER_USER@$SERVER_IP "
           docker pull amitgiri13/randmetask:1.0.0
-          docker run --name randmetask -p 80:8000 -d amitgiri13/randmetask:1.0.0
-          EOF 
+          docker pull postgres:15
+
+          # run postgres
+          docker run -d \
+            --name db \
+            -e POSTGRES_USER=$POSTGRES_USER
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            -e POSTGRES_DB=$POSTGRES_DB
+            -p 5432:5432 \
+            postgres:15
           
-
-
-      
+          # run app
+          docker run -d \
+            --name app \
+            -e POSTGRES_USER=$POSTGRES_USER
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+            -e POSTGRES_DB=$POSTGRES_DB
+            -p 80:8080 \
+            -v postgres_data:/var/lib/postgresql/data \
+            --link db:db \
+            $DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG
+          "
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DOCKER_HUB_USER: $DOCKER_HUB_USER
+          DOCKER_HUB_REPO: $DOCKER_HUB_REPO
+          TAG: $TAG
+              
 
 
            
