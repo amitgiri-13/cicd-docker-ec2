@@ -66,18 +66,18 @@ jobs:
           # run postgres
           docker run -d \
             --name db \
-            -e POSTGRES_USER=$POSTGRES_USER
-            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-            -e POSTGRES_DB=$POSTGRES_DB
+            -e POSTGRES_USER=$POSTGRES_USER \
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            -e POSTGRES_DB=$POSTGRES_DB \
             -p 5432:5432 \
             postgres:15
           
           # run app
           docker run -d \
             --name app \
-            -e POSTGRES_USER=$POSTGRES_USER
-            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-            -e POSTGRES_DB=$POSTGRES_DB
+            -e POSTGRES_USER=$POSTGRES_USER \
+            -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+            -e POSTGRES_DB=$POSTGRES_DB \
             -p 80:8080 \
             -v postgres_data:/var/lib/postgresql/data \
             --link db:db \
