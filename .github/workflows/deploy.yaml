@@ -66,7 +66,7 @@ jobs:
           ssh -i mykey.pem $SERVER_USER@$SERVER_IP "
 
           # create env file
-          echo POSTGRES_USER=$POSTGRES_USER >> ~/.env 
+          echo POSTGRES_USER=$POSTGRES_USER > ~/.env 
           echo POSTGRES_PASSWORD=$POSTGRES_PASSWORD >> ~/.env 
           echo POSTGRES_DB=$POSTGRES_DB >> ~/.env 
 
@@ -81,8 +81,8 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          DOCKER_HUB_USER: $DOCKER_HUB_USER
-          DOCKER_HUB_REPO: $DOCKER_HUB_REPO
+          DOCKER_HUB_USER: ${{ vars.DOCKER_HUB_USER }}
+          DOCKER_HUB_REPO: ${{ vars.DOCKER_HUB_REPO }}
           TAG: $TAG
               
 
