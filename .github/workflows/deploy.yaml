@@ -50,7 +50,7 @@ jobs:
 
       - name: Add private key for ssh 
         run: |
-          echo $SSH_KEY64 | base64 -d >> mykey.pem
+          echo "$SSH_KEY64" | base64 -d >> mykey.pem
           chmod 400 mykey.pem 
           ssh-keygen -R $SERVER_IP
         env: 
