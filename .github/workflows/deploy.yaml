@@ -52,6 +52,7 @@ jobs:
         run: |
           echo "$SSH_KEY64" | base64 -d >> mykey.pem
           chmod 400 mykey.pem 
+          touch ~/.ssh/known_hosts
           ssh-keygen -R $SERVER_IP
         env: 
           SSH_KEY64: ${{ secrets.SSH_KEY64 }}
