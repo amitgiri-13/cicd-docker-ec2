@@ -75,7 +75,7 @@ jobs:
 
           docker compose up -d --build 
 
-          rm ~/.env  
+        
           "
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
