@@ -14,7 +14,7 @@ pipeline {
 
     stages {
 
-        stage("Build Image") {
+        stage("Build and Push Image") {
 
             steps  {
 
@@ -30,6 +30,36 @@ pipeline {
                 '''
             } 
             }       
+        }
+
+        stage("Deploy To EC2") {
+
+            steps {
+                withCredentials([
+                    string(credentialsId: "SSH_KEY", variable: "SSH_KEY_FILE")
+                ]) {
+                    sh '''
+                        set -e 
+                        mkdir -p ~/.ssh
+                        chmod 700 ~/.ssh
+                        echo -e "HOST *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+                        chmod 600 ~/.ssh/config
+
+                        echo "$SSH_KEY" > mykey.pem
+                        chmod 400 mykey.pem
+                        touch ~/.ssh/known_hosts
+                        ssh-keygen -R "$SERVER_IP"
+
+                        scp -i mykey.pem ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
+
+                        ssh -i mykey.pem $SERVER_USER@$$SERVER_IP "
+                        docker compose --env-file ./.env/dev_env pull
+                        docker compose --env-file ./.env/dev_env down
+                        docker compose --env-file ./.env/dev_env up -d
+                        "
+                    '''
+                }
+            }
         }
 
     }
