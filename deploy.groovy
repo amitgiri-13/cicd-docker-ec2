@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        any
-    }
+    agent any
 
     parameters {
         string(name: "SERVER_IP", description: "Public ip of EC2")
