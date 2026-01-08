@@ -14,23 +14,23 @@ pipeline {
 
     stages {
 
-        stage("Build and Push Image") {
+        // stage("Build and Push Image") {
 
-            steps  {
+        //     steps  {
 
-                withCredentials([
-                string(credentialsId: "DOCKER_HUB_PASSWORD", variable: "DOCKER_HUB_PASSWORD")
-            ]
-            ){
-                sh '''
-                    set -e 
-                    echo "$DOCKER_HUB_PASSWORD" | docker login -u $DOCKER_HUB_USER --password-stdin
-                    docker build -t "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG" .
-                    docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
-                '''
-            } 
-            }       
-        }
+        //         withCredentials([
+        //         string(credentialsId: "DOCKER_HUB_PASSWORD", variable: "DOCKER_HUB_PASSWORD")
+        //     ]
+        //     ){
+        //         sh '''
+        //             set -e 
+        //             echo "$DOCKER_HUB_PASSWORD" | docker login -u $DOCKER_HUB_USER --password-stdin
+        //             docker build -t "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG" .
+        //             docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
+        //         '''
+        //     } 
+        //     }       
+        // }
 
         stage("Deploy To EC2") {
 
@@ -50,7 +50,7 @@ pipeline {
                         touch ~/.ssh/known_hosts
                         ssh-keygen -R "$SERVER_IP"
 
-                        scp -i mykey.pem ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
+                        scp -i "./mykey.pem" ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
 
                         ssh -i mykey.pem $SERVER_USER@$$SERVER_IP "
                         docker compose --env-file ./.env/dev_env pull
