@@ -1,67 +1,42 @@
 pipeline {
-    agent any
+    agent {
+        any
+    }
+
+    parameters {
+        string(name: "SERVER_IP", description: "Public ip of EC2")
+    }
 
     environment {
-        APP_DIR  = 'member-manager'
-        REPO_URL = 'https://github.com/amitgiri-13/cicd-docker-ec2.git'
-        SSH_USER = 'ubuntu'
+        SERVER_USER = "ubuntu"
+        DOCKER_HUB_USER = "amitgiri13"
+        DOCKER_HUB_REPO = "manage-members"
+        TAG = "latest"
     }
 
     stages {
 
-        stage('Checkout') {
+        stage("Build Image") {
+            
             steps {
                 checkout scm
             }
-        }
 
-        stage('Configure SSH & Deploy') {
-            steps {
+            steps  {
                 withCredentials([
-                    string(credentialsId: 'SERVER_IP', variable: 'SERVER_IP'),
-                    file(credentialsId: 'SSH_KEY64', variable: 'SSH_KEY_FILE')
-                ]) {
-                    sh '''
-                    set -e
-
-                    chmod 400 "$SSH_KEY_FILE"
-
-                    mkdir -p ~/.ssh
-                    chmod 700 ~/.ssh
-                    echo -e "Host *\\n\\tStrictHostKeyChecking no\\n" > ~/.ssh/config
-                    chmod 600 ~/.ssh/config
-
-                    ssh-keygen -R "$SERVER_IP" || true
-
-                    ssh -i "$SSH_KEY_FILE" ${SSH_USER}@${SERVER_IP} << 'EOF'
-                      set -e
-
-                      APP_DIR='member-manager'
-                      REPO_URL='https://github.com/amitgiri-13/cicd-docker-ec2.git'
-
-                      if [ -d ~/$APP_DIR/.git ]; then
-                        cd ~/$APP_DIR
-                        git reset --hard
-                        git pull origin main
-                      else
-                        git clone $REPO_URL $APP_DIR
-                        cd ~/$APP_DIR
-                      fi
-
-                      docker compose pull
-                      docker compose up -d --build
-                    '''
-                }
-            }
+                string(credentialsId: "DOCKER_HUB_PASSWORD", variable: "DOCKER_HUB_PASSWORD")
+            ]
+            ){
+                sh """
+                    set -e 
+                    echo "$DOCKER_HUB_PASSWORD" | docker login -u $DOCKER_HUB_USER --password-stdin
+                    docker build -t $DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG
+                    docker push "$DOCKER_HUB_USER/$DOCKER_HUB_REPO:$TAG"
+                """
+            } 
+            }       
         }
-    }
 
-    post {
-        success {
-            echo "Deployment successful"
-        }
-        failure {
-            echo "Deployment failed"
-        }
+        stage("")
     }
 }
