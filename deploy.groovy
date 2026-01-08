@@ -45,14 +45,11 @@ pipeline {
                         echo -e "HOST *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
                         chmod 600 ~/.ssh/config
 
-                        echo "$SSH_KEY" > ~/mykey.pem
-                        chmod 400 ~/mykey.pem
-                        touch ~/.ssh/known_hosts
                         ssh-keygen -R "$SERVER_IP"
 
-                        scp -i "~/mykey.pem" ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
+                        scp -i $SSH_KEY ./docker-compose.yaml $SERVER_USER@$SERVER_IP:~/
 
-                        ssh -i mykey.pem $SERVER_USER@$$SERVER_IP "
+                        ssh -i $SSH_KEY $SERVER_USER@$$SERVER_IP "
                         docker compose --env-file ./.env/dev_env pull
                         docker compose --env-file ./.env/dev_env down
                         docker compose --env-file ./.env/dev_env up -d
