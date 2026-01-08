@@ -242,3 +242,4 @@ override.tf.json
 *.vscode/
 .idea/
 
+push.sh
