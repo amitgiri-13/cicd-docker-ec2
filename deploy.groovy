@@ -15,12 +15,9 @@ pipeline {
     stages {
 
         stage("Build Image") {
-            
-            steps {
-                checkout scm
-            }
 
             steps  {
+
                 withCredentials([
                 string(credentialsId: "DOCKER_HUB_PASSWORD", variable: "DOCKER_HUB_PASSWORD")
             ]
