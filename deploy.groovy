@@ -36,7 +36,7 @@ pipeline {
 
             steps {
                 withCredentials([
-                    string(credentialsId: "SSH_KEY", variable: "SSH_KEY64")
+                    string(credentialsId: "SSH_KEY64", variable: "SSH_KEY")
                 ]) {
                     sh '''
                         set -e 
