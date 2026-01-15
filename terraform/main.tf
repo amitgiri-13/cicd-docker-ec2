@@ -11,5 +11,5 @@ module "ec2" {
   source            = "./module/ec2"
   security_group_id = module.vpc.security_group_id
   subnet_id         = module.vpc.subnet_id
-  user_data         = file("user-data.sh")
+  user_data         = "" #file("user-data.sh")
 }   
