@@ -1,0 +1,5 @@
+- name: Update system (Debian/Ubuntu)
+  apt:
+    update_cache: yes
+    upgrade: dist
+  when: ansible_facts.os_family == "Debian"

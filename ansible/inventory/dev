@@ -1,0 +1,2 @@
+[app_server]
+ec2 ansible_host=54.173.76.144 ansible_user=ubuntu ansible_ssh_private_key_file=~/Downloads/terraformkey.pem

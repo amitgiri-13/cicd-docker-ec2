@@ -1,0 +1,86 @@
+- name: Remove old Docker repo if present
+  file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: absent
+
+- name: Remove old Docker key if present
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    state: absent
+
+- name: Install required packages
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    update_cache: yes
+    state: present
+
+- name: Create keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Add Docker GPG key (correct for noble)
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+
+- name: Fix Docker GPG key permissions (APT requirement)
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Set Docker architecture
+  set_fact:
+    docker_arch: >-
+      {{ 'amd64' if ansible_facts.architecture == 'x86_64'
+         else 'arm64' }}
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: >
+      deb [arch={{ docker_arch }}
+      signed-by=/etc/apt/keyrings/docker.gpg]
+      https://download.docker.com/linux/ubuntu
+      {{ ansible_facts.distribution_release }} stable
+    filename: docker
+    state: present
+    update_cache: no
+
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Docker Engine and Compose plugin
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+
+- name: Start and enable Docker
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Add user to docker group
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes

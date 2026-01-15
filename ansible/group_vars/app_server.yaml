@@ -1,0 +1,5 @@
+server_user: ubuntu
+app_name: manage-members
+app_dir: /home/ubuntu/manage-members
+
+docker_compose_file: docker-compose.yaml

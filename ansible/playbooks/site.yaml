@@ -1,0 +1,8 @@
+- name: Configure EC2 server
+  hosts: app_server
+  become: true
+
+
+  roles:
+    - common
+    - docker
